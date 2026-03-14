@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI小说连载系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-book"></i> AI小说系统</h1>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" data-page="projects"><i class="fas fa-folder"></i> 项目管理</a></li>
+                    <li><a href="#" data-page="settings"><i class="fas fa-cog"></i> 设定编辑</a></li>
+                    <li><a href="#" data-page="outlines"><i class="fas fa-list"></i> 大纲管理</a></li>
+                    <li><a href="#" data-page="chapters"><i class="fas fa-file-alt"></i> 章节生成</a></li>
+                    <li><a href="#" data-page="config"><i class="fas fa-sliders-h"></i> 配置管理</a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="current-project" id="currentProject">
+                    <i class="fas fa-info-circle"></i> 未选择项目
+                </div>
+            </div>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 项目管理页面 -->
+            <div id="projectsPage" class="page active">
+                <div class="page-header">
+                    <h2><i class="fas fa-folder"></i> 项目管理</h2>
+                    <button class="btn btn-primary" onclick="showCreateProjectModal()">
+                        <i class="fas fa-plus"></i> 创建新项目
+                    </button>
+                </div>
+                
+                <div class="projects-list" id="projectsList">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+            
+            <!-- 设定编辑页面 -->
+            <div id="settingsPage" class="page">
+                <div class="page-header">
+                    <h2><i class="fas fa-cog"></i> 设定编辑</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" onclick="refreshMemoryFiles()">
+                            <i class="fas fa-sync"></i> 刷新
+                        </button>
+                        <button class="btn btn-primary" onclick="saveAllMemoryFiles()">
+                            <i class="fas fa-save"></i> 保存全部
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="settings-container">
+                    <div class="settings-sidebar">
+                        <h3>设定文件列表</h3>
+                        <ul id="memoryFilesList" class="file-list">
+                            <li class="loading">加载中...</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="settings-editor">
+                        <div id="editorPlaceholder" class="editor-placeholder">
+                            <i class="fas fa-file-alt"></i>
+                            <p>请从左侧选择要编辑的文件</p>
+                        </div>
+                        
+                        <div id="editorContainer" class="editor-container" style="display: none;">
+                            <div class="editor-header">
+                                <h3 id="editorTitle">文件名</h3>
+                                <button class="btn btn-primary" onclick="saveCurrentFile()">
+                                    <i class="fas fa-save"></i> 保存
+                                </button>
+                            </div>
+                            <textarea id="fileEditor" class="file-editor" placeholder="文件内容..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 大纲管理页面 -->
+            <div id="outlinesPage" class="page">
+                <div class="page-header">
+                    <h2><i class="fas fa-list"></i> 大纲管理</h2>
+                </div>
+                
+                <div class="outlines-container">
+                    <div class="outline-tabs">
+                        <button class="tab-btn active" data-tab="general">总纲</button>
+                        <button class="tab-btn" data-tab="volumes">卷纲</button>
+                        <button class="tab-btn" data-tab="chapters">细纲</button>
+                    </div>
+                    
+                    <!-- 总纲标签页 -->
+                    <div id="generalTab" class="tab-content active">
+                        <div class="outline-actions">
+                            <button class="btn btn-primary" onclick="generateGeneralOutline()">
+                                <i class="fas fa-magic"></i> 生成总纲
+                            </button>
+                            <button class="btn btn-success" id="saveGeneralBtn" onclick="saveGeneralOutline()" style="display: none;">
+                                <i class="fas fa-save"></i> 保存总纲
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadGeneralOutline()">
+                                <i class="fas fa-sync"></i> 刷新
+                            </button>
+                        </div>
+                        <div id="generalOutlineContent" class="outline-content">
+                            <div class="loading">加载中...</div>
+                        </div>
+                        <textarea id="generalOutlineEditor" class="outline-editor" style="display: none;" placeholder="总纲内容..."></textarea>
+                    </div>
+                    
+                    <!-- 卷纲标签页 -->
+                    <div id="volumesTab" class="tab-content">
+                        <div class="outline-actions">
+                            <button class="btn btn-primary" onclick="showGenerateVolumeModal()">
+                                <i class="fas fa-plus"></i> 生成卷纲
+                            </button>
+                            <button class="btn btn-success" id="saveVolumeBtn" onclick="saveVolumeOutline()" style="display: none;">
+                                <i class="fas fa-save"></i> 保存卷纲
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadVolumes()">
+                                <i class="fas fa-sync"></i> 刷新
+                            </button>
+                        </div>
+                        <div id="volumesList" class="volumes-list">
+                            <div class="loading">加载中...</div>
+                        </div>
+                        <div id="volumeOutlineContent" class="outline-content" style="display: none;">
+                            <div class="loading">加载中...</div>
+                        </div>
+                        <textarea id="volumeOutlineEditor" class="outline-editor" style="display: none;" placeholder="卷纲内容..."></textarea>
+                    </div>
+                    
+                    <!-- 细纲标签页 -->
+                    <div id="chaptersTab" class="tab-content">
+                        <div class="outline-actions">
+                            <select id="volumeSelect" onchange="loadChapters()">
+                                <option value="">选择卷号</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="showGenerateChapterModal()">
+                                <i class="fas fa-plus"></i> 生成细纲
+                            </button>
+                            <button class="btn btn-success" id="saveChapterBtn" onclick="saveChapterOutline()" style="display: none;">
+                                <i class="fas fa-save"></i> 保存细纲
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadChapters()">
+                                <i class="fas fa-sync"></i> 刷新
+                            </button>
+                        </div>
+                        <div id="chaptersList" class="chapters-list">
+                            <div class="loading">请先选择卷号</div>
+                        </div>
+                        <div id="chapterOutlineContent" class="outline-content" style="display: none;">
+                            <div class="loading">加载中...</div>
+                        </div>
+                        <textarea id="chapterOutlineEditor" class="outline-editor" style="display: none;" placeholder="细纲内容..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 章节生成页面 -->
+            <div id="chaptersPage" class="page">
+                <div class="page-header">
+                    <h2><i class="fas fa-file-alt"></i> 章节生成</h2>
+                </div>
+                
+                <div class="chapters-container">
+                    <div class="chapter-controls">
+                        <div class="control-group">
+                            <label>卷号:</label>
+                            <select id="generateVolumeSelect" onchange="loadChaptersForGenerate()">
+                                <option value="">选择卷号</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>已选章节:</label>
+                            <span id="selectedChapterDisplay" class="selected-chapter-display">未选择</span>
+                        </div>
+                        <button class="btn btn-primary" id="generateChapterBtn" onclick="generateChapter()" disabled>
+                            <i class="fas fa-magic"></i> 生成章节
+                        </button>
+                    </div>
+                    
+                    <div id="generateChaptersList" class="generate-chapters-list">
+                        <div class="placeholder">
+                            <i class="fas fa-list"></i>
+                            <p>请先选择卷号</p>
+                        </div>
+                    </div>
+                    
+                    <div id="chapterContent" class="chapter-content" style="display: none;">
+                        <div class="placeholder">
+                            <i class="fas fa-file-alt"></i>
+                            <p>选择章节并点击生成</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 配置管理页面 -->
+            <div id="configPage" class="page">
+                <div class="page-header">
+                    <h2><i class="fas fa-sliders-h"></i> 配置管理</h2>
+                </div>
+                
+                <div class="config-container">
+                    <div class="loading">加载配置中...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 创建项目模态框 -->
+    <div id="createProjectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>创建新项目</h3>
+                <button class="modal-close" onclick="closeModal('createProjectModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>项目名称:</label>
+                    <input type="text" id="projectNameInput" placeholder="请输入项目名称">
+                </div>
+                <div class="form-group">
+                    <label>题材:</label>
+                    <select id="projectGenreInput">
+                        <option value="玄幻">玄幻</option>
+                        <option value="都市">都市</option>
+                        <option value="都市异能">都市异能</option>
+                        <option value="仙侠">仙侠</option>
+                        <option value="科幻">科幻</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>目标总字数:</label>
+                    <input type="number" id="projectWordCountInput" value="1000000" min="100000">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('createProjectModal')">取消</button>
+                <button class="btn btn-primary" onclick="createProject()">创建</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "current_platform": "ollama",
+  "platforms": {
+    "ollama": {
+      "enabled": true,
+      "base_url": "http://localhost:11434",
+      "model": "qwen3:30b",
+      "timeout": 300,
+      "temperature": 0.7,
+      "max_tokens": 4000
+    },
+    "openai": {
+      "enabled": false,
+      "api_key": "",
+      "base_url": "https://api.openai.com/v1",
+      "model": "gpt-4",
+      "timeout": 60,
+      "temperature": 0.7,
+      "max_tokens": 4000
+    },
+    "anthropic": {
+      "enabled": false,
+      "api_key": "",
+      "base_url": "https://api.anthropic.com",
+      "model": "claude-3-opus-20240229",
+      "timeout": 60,
+      "temperature": 0.7,
+      "max_tokens": 4000
+    },
+    "deepseek": {
+      "enabled": false,
+      "api_key": "",
+      "base_url": "https://api.deepseek.com",
+      "model": "deepseek-chat",
+      "timeout": 60,
+      "temperature": 0.7,
+      "max_tokens": 4000
+    },
+    "qianwen": {
+      "enabled": false,
+      "api_key": "",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen-turbo",
+      "timeout": 60,
+      "temperature": 0.7,
+      "max_tokens": 4000
+    },
+    "zhipu": {
+      "enabled": false,
+      "api_key": "",
+      "base_url": "https://open.bigmodel.cn/api/paas/v4",
+      "model": "glm-4",
+      "timeout": 60,
+      "temperature": 0.7,
+      "max_tokens": 4000
+    }
+  }
+}

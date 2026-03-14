@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# 项目特定
+.env
+logs/
+*.log
+
+# 项目数据（可以选择性提交）
+projects/
+projects_index.json
+
+# 单个项目的文件（如果使用旧版本）
+chapters/
+memory/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 临时文件
+*.tmp
+*.bak
+.DS_Store
